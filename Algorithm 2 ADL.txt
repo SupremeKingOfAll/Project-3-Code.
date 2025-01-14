@@ -1,0 +1,71 @@
+converted to ADL: 
+Algorithm 
+Dijkstra(Graph: Dictionary of <int, List<(int, int)>>, Source: int) -> Dictionary of <int, int> 
+
+    Input: 
+
+        Graph - A dictionary representing the weighted adjacency list 
+
+        Source - The starting node for shortest path calculation 
+
+    Output: 
+
+        Distances - A dictionary containing the shortest distances from the Source node to all other nodes 
+
+  
+
+    Begin 
+
+        Distances ← Empty Dictionary<int, int> 
+
+        For Each Node in Graph.Keys Do 
+
+            Distances[Node] ← ∞ // Initialize distances to infinity 
+
+        End For 
+
+        Distances[Source] ← 0 // Distance to Source is 0 
+
+  
+
+        PriorityQueue ← Empty SortedSet<(int Distance, int Node)> 
+
+        PriorityQueue.Add((0, Source)) // Add the Source node to the queue with distance 0 
+
+  
+
+        While PriorityQueue.Count > 0 Do 
+
+            (CurrentDistance, CurrentNode) ← PriorityQueue.Min // Get the node with the smallest distance 
+
+            PriorityQueue.Remove(PriorityQueue.Min) 
+
+  
+
+            // Process neighbors of the CurrentNode 
+
+            For Each (Neighbor, Weight) in Graph[CurrentNode] Do 
+
+                NewDistance ← CurrentDistance + Weight 
+
+  
+
+                If NewDistance < Distances[Neighbor] Then 
+
+                    PriorityQueue.Remove((Distances[Neighbor], Neighbor)) // Remove outdated entry 
+
+                    Distances[Neighbor] ← NewDistance // Update distance 
+
+                    PriorityQueue.Add((NewDistance, Neighbor)) // Add updated entry 
+
+                End If 
+
+            End For 
+
+        End While 
+
+  
+
+        Return Distances 
+
+    End 

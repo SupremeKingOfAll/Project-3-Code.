@@ -1,0 +1,43 @@
+My Algorithm used: FindInfluencers 
+
+Input: AdjacencyList (list of neighbors for each node) 
+
+Output: Influencers (list of nodes with the highest degree) 
+
+  
+
+Begin 
+
+    MaxDegree ← 0 
+
+    Influencers ← Empty List 
+
+  
+
+    For each Node in AdjacencyList do 
+
+        Degree ← Size of AdjacencyList[Node]  // Count neighbors of the Node 
+
+  
+
+        If Degree > MaxDegree then 
+
+            MaxDegree ← Degree 
+
+            Influencers ← [Node]  // Reset Influencers list with the new Node 
+
+  
+
+        Else If Degree = MaxDegree then 
+
+            Append Node to Influencers  // Add Node to the list of Influencers 
+
+  
+
+    End For 
+
+  
+
+    Return Influencers 
+
+End 

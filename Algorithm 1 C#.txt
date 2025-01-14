@@ -1,0 +1,91 @@
+using System; 
+
+using System.Collections.Generic; 
+
+  
+
+class Program 
+
+{ 
+
+    static void Main() 
+
+    { 
+
+        // My Adjacency List Example:: 
+
+        Dictionary<int, List<int>> AdjacencyList = new Dictionary<int, List<int>> 
+
+        { 
+
+            { 0, new List<int> { 1, 2 } }, 
+
+            { 1, new List<int> { 0, 3, 4 } }, 
+
+            { 2, new List<int> { 0, 4 } }, 
+
+            { 3, new List<int> { 1 } }, 
+
+            { 4, new List<int> { 1, 2, 5 } }, 
+
+            { 5, new List<int> { 4, 6 } }, 
+
+            { 6, new List<int> { 5 } } 
+
+        }; 
+
+  
+
+        List<int> Influencers = FindInfluencers(AdjacencyList); 
+
+        Console.WriteLine("// My Current Influencers: " + string.Join(", ", Influencers) + " //"); 
+
+    } 
+
+  
+
+    static List<int> FindInfluencers(Dictionary<int, List<int>> AdjacencyList) 
+
+    { 
+
+        int MaxDegree = 0; 
+
+        List<int> Influencers = new List<int>(); 
+
+  
+
+        foreach (var Node in AdjacencyList) 
+
+        { 
+
+            int Degree = Node.Value.Count; 
+
+  
+
+            if (Degree > MaxDegree) 
+
+            { 
+
+                MaxDegree = Degree; 
+
+                Influencers = new List<int> { Node.Key }; 
+
+            } 
+
+            else if (Degree == MaxDegree) 
+
+            { 
+
+                Influencers.Add(Node.Key); 
+
+            } 
+
+        } 
+
+  
+
+        return Influencers; 
+
+    } 
+
+} 

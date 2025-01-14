@@ -1,0 +1,68 @@
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        // Define the weighted adjacency list
+        Dictionary<int, List<(int, int)>> AdjacencyList = new Dictionary<int, List<(int, int)>>()
+        {
+            { 0, new List<(int, int)> { (1, 2), (2, 4) } },
+            { 1, new List<(int, int)> { (0, 2), (3, 1), (4, 3) } },
+            { 2, new List<(int, int)> { (0, 4), (4, 2) } },
+            { 3, new List<(int, int)> { (1, 1) } },
+            { 4, new List<(int, int)> { (1, 3), (2, 2), (5, 1) } },
+            { 5, new List<(int, int)> { (4, 1), (6, 2) } },
+            { 6, new List<(int, int)> { (5, 2) } }
+        };
+
+        // Run Dijkstra's algorithm from source node 0
+        Dictionary<int, int> Distances = Dijkstra(AdjacencyList, 0);
+
+        // Print results
+        Console.WriteLine("Vertex\tDistance from Source");
+        foreach (var Kvp in Distances)
+        {
+            Console.WriteLine(Kvp.Key + "\t" + Kvp.Value);
+        }
+    }
+
+    static Dictionary<int, int> Dijkstra(Dictionary<int, List<(int, int)>> Graph, int Source)
+    {
+        // Initialize distances and priority queue
+        Dictionary<int, int> Distances = new Dictionary<int, int>();
+        foreach (var Node in Graph.Keys)
+        {
+            Distances[Node] = int.MaxValue;
+        }
+        Distances[Source] = 0;
+
+        // Priority queue to process nodes based on shortest known distance
+        SortedSet<(int Distance, int Node)> PriorityQueue = new SortedSet<(int, int)>();
+        PriorityQueue.Add((0, Source));
+
+        while (PriorityQueue.Count > 0)
+        {
+            // Get the node with the smallest distance
+            var (CurrentDistance, CurrentNode) = PriorityQueue.Min;
+            PriorityQueue.Remove(PriorityQueue.Min);
+
+            // Process neighbors
+            foreach (var (Neighbor, Weight) in Graph[CurrentNode])
+            {
+                int NewDistance = CurrentDistance + Weight;
+
+                // If a shorter path is found, update the distance and re-add to the queue
+                if (NewDistance < Distances[Neighbor])
+                {
+                    PriorityQueue.Remove((Distances[Neighbor], Neighbor)); // Remove outdated distance
+                    Distances[Neighbor] = NewDistance;
+                    PriorityQueue.Add((NewDistance, Neighbor));
+                }
+            }
+        }
+
+        return Distances;
+    }
+}
