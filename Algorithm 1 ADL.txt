@@ -1,43 +1,59 @@
-My Algorithm used: FindInfluencers 
+Algorithm: CalculateInfluenceScores(Graph)
+Input: Graph (Adjacency List)
+Output: MostInfluential (List of nodes with highest influence score)
 
-Input: AdjacencyList (list of neighbors for each node) 
+Begin
+    NodeCount ← Number of nodes in Graph
+    InfluenceScores ← Empty Dictionary
 
-Output: Influencers (list of nodes with the highest degree) 
+    For each StartNode in Graph do
+        TotalDistance ← RunBFS(Graph, StartNode)
+        Score ← (NodeCount - 1) / TotalDistance
+        InfluenceScores[StartNode] ← Score
+    End For
 
-  
+    MaxScore ← -∞
+    MostInfluential ← Empty List
 
-Begin 
+    For each Entry in InfluenceScores do
+        If Entry.Score > MaxScore then
+            MaxScore ← Entry.Score
+            MostInfluential ← [Entry.Key]
+        Else If Entry.Score = MaxScore then
+            Append Entry.Key to MostInfluential
+        End If
+    End For
 
-    MaxDegree ← 0 
+    Return MostInfluential
+End
 
-    Influencers ← Empty List 
+Subroutine: RunBFS(Graph, StartNode)
+Begin
+    Distances ← Dictionary with default ∞
+    For each Node in Graph.Keys do
+        Distances[Node] ← ∞
+    End For
+    Distances[StartNode] ← 0
 
-  
+    Queue ← New Queue
+    Enqueue StartNode
 
-    For each Node in AdjacencyList do 
+    While Queue is not empty do
+        Current ← Dequeue
+        For each Neighbour in Graph[Current] do
+            If Distances[Neighbour] = ∞ then
+                Distances[Neighbour] ← Distances[Current] + 1
+                Enqueue Neighbour
+            End If
+        End For
+    End While
 
-        Degree ← Size of AdjacencyList[Node]  // Count neighbors of the Node 
+    Sum ← 0
+    For each Distance in Distances.Values do
+        If Distance ≠ ∞ then
+            Sum ← Sum + Distance
+        End If
+    End For
 
-  
-
-        If Degree > MaxDegree then 
-
-            MaxDegree ← Degree 
-
-            Influencers ← [Node]  // Reset Influencers list with the new Node 
-
-  
-
-        Else If Degree = MaxDegree then 
-
-            Append Node to Influencers  // Add Node to the list of Influencers 
-
-  
-
-    End For 
-
-  
-
-    Return Influencers 
-
-End 
+    Return Sum
+End
