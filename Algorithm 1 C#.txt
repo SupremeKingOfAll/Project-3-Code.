@@ -1,91 +1,85 @@
-using System; 
+using System;
+using System.Collections.Generic;
 
-using System.Collections.Generic; 
+class Program
+{
+    static void Main()
+    {
+        Dictionary<int, List<int>> AdjacencyList = new Dictionary<int, List<int>>
+        {
+            { 0, new List<int> { 1, 2 } },
+            { 1, new List<int> { 0, 3, 4 } },
+            { 2, new List<int> { 0, 4 } },
+            { 3, new List<int> { 1 } },
+            { 4, new List<int> { 1, 2, 5 } },
+            { 5, new List<int> { 4, 6 } },
+            { 6, new List<int> { 5 } }
+        };
 
-  
+        int NodeCount = AdjacencyList.Count;
+        Dictionary<int, double> InfluenceScores = new Dictionary<int, double>();
 
-class Program 
+        foreach (int StartNode in AdjacencyList.Keys)
+        {
+            int TotalDistance = RunBFS(AdjacencyList, StartNode);
+            double Score = (double)(NodeCount - 1) / TotalDistance;
+            InfluenceScores[StartNode] = Score;
+        }
 
-{ 
+        double MaxScore = double.MinValue;
+        List<int> MostInfluential = new List<int>();
 
-    static void Main() 
+        foreach (var Kvp in InfluenceScores)
+        {
+            if (Kvp.Value > MaxScore)
+            {
+                MaxScore = Kvp.Value;
+                MostInfluential = new List<int> { Kvp.Key };
+            }
+            else if (Kvp.Value == MaxScore)
+            {
+                MostInfluential.Add(Kvp.Key);
+            }
+        }
 
-    { 
+        Console.WriteLine("Most Influential Node(s): " + string.Join(", ", MostInfluential));
+    }
 
-        // My Adjacency List Example:: 
+    static int RunBFS(Dictionary<int, List<int>> AdjacencyList, int StartNode)
+    {
+        Queue<int> Queue = new Queue<int>();
+        Dictionary<int, int> Distances = new Dictionary<int, int>();
 
-        Dictionary<int, List<int>> AdjacencyList = new Dictionary<int, List<int>> 
+        foreach (int Node in AdjacencyList.Keys)
+        {
+            Distances[Node] = int.MaxValue;
+        }
 
-        { 
+        Distances[StartNode] = 0;
+        Queue.Enqueue(StartNode);
 
-            { 0, new List<int> { 1, 2 } }, 
+        while (Queue.Count > 0)
+        {
+            int Current = Queue.Dequeue();
+            foreach (int Neighbour in AdjacencyList[Current])
+            {
+                if (Distances[Neighbour] == int.MaxValue)
+                {
+                    Distances[Neighbour] = Distances[Current] + 1;
+                    Queue.Enqueue(Neighbour);
+                }
+            }
+        }
 
-            { 1, new List<int> { 0, 3, 4 } }, 
+        int Sum = 0;
+        foreach (int Distance in Distances.Values)
+        {
+            if (Distance != int.MaxValue)
+            {
+                Sum += Distance;
+            }
+        }
 
-            { 2, new List<int> { 0, 4 } }, 
-
-            { 3, new List<int> { 1 } }, 
-
-            { 4, new List<int> { 1, 2, 5 } }, 
-
-            { 5, new List<int> { 4, 6 } }, 
-
-            { 6, new List<int> { 5 } } 
-
-        }; 
-
-  
-
-        List<int> Influencers = FindInfluencers(AdjacencyList); 
-
-        Console.WriteLine("// My Current Influencers: " + string.Join(", ", Influencers) + " //"); 
-
-    } 
-
-  
-
-    static List<int> FindInfluencers(Dictionary<int, List<int>> AdjacencyList) 
-
-    { 
-
-        int MaxDegree = 0; 
-
-        List<int> Influencers = new List<int>(); 
-
-  
-
-        foreach (var Node in AdjacencyList) 
-
-        { 
-
-            int Degree = Node.Value.Count; 
-
-  
-
-            if (Degree > MaxDegree) 
-
-            { 
-
-                MaxDegree = Degree; 
-
-                Influencers = new List<int> { Node.Key }; 
-
-            } 
-
-            else if (Degree == MaxDegree) 
-
-            { 
-
-                Influencers.Add(Node.Key); 
-
-            } 
-
-        } 
-
-  
-
-        return Influencers; 
-
-    } 
-
-} 
+        return Sum;
+    }
+}
