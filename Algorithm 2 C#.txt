@@ -5,8 +5,7 @@ class Program
 {
     static void Main()
     {
-        // Define the weighted adjacency list
-        Dictionary<int, List<(int, int)>> AdjacencyList = new Dictionary<int, List<(int, int)>>()
+        Dictionary<int, List<(int, int)>> AdjacencyList = new Dictionary<int, List<(int, int)>>
         {
             { 0, new List<(int, int)> { (1, 2), (2, 4) } },
             { 1, new List<(int, int)> { (0, 2), (3, 1), (4, 3) } },
@@ -17,48 +16,68 @@ class Program
             { 6, new List<(int, int)> { (5, 2) } }
         };
 
-        // Run Dijkstra's algorithm from source node 0
-        Dictionary<int, int> Distances = Dijkstra(AdjacencyList, 0);
+        int NodeCount = AdjacencyList.Count;
+        Dictionary<int, double> InfluenceScores = new Dictionary<int, double>();
 
-        // Print results
-        Console.WriteLine("Vertex\tDistance from Source");
-        foreach (var Kvp in Distances)
+        foreach (int StartNode in AdjacencyList.Keys)
         {
-            Console.WriteLine(Kvp.Key + "\t" + Kvp.Value);
+            Dictionary<int, int> Distances = RunDijkstra(AdjacencyList, StartNode);
+            int TotalDistance = 0;
+            foreach (int Distance in Distances.Values)
+            {
+                if (Distance != int.MaxValue)
+                    TotalDistance += Distance;
+            }
+
+            double Score = (double)(NodeCount - 1) / TotalDistance;
+            InfluenceScores[StartNode] = Score;
         }
+
+        double MaxScore = double.MinValue;
+        List<int> MostInfluential = new List<int>();
+
+        foreach (var Kvp in InfluenceScores)
+        {
+            if (Kvp.Value > MaxScore)
+            {
+                MaxScore = Kvp.Value;
+                MostInfluential = new List<int> { Kvp.Key };
+            }
+            else if (Kvp.Value == MaxScore)
+            {
+                MostInfluential.Add(Kvp.Key);
+            }
+        }
+
+        Console.WriteLine("Most Influential Node(s): " + string.Join(", ", MostInfluential));
     }
 
-    static Dictionary<int, int> Dijkstra(Dictionary<int, List<(int, int)>> Graph, int Source)
+    static Dictionary<int, int> RunDijkstra(Dictionary<int, List<(int, int)>> Graph, int Source)
     {
-        // Initialize distances and priority queue
         Dictionary<int, int> Distances = new Dictionary<int, int>();
-        foreach (var Node in Graph.Keys)
+        foreach (int Node in Graph.Keys)
         {
             Distances[Node] = int.MaxValue;
         }
-        Distances[Source] = 0;
 
-        // Priority queue to process nodes based on shortest known distance
+        Distances[Source] = 0;
         SortedSet<(int Distance, int Node)> PriorityQueue = new SortedSet<(int, int)>();
         PriorityQueue.Add((0, Source));
 
         while (PriorityQueue.Count > 0)
         {
-            // Get the node with the smallest distance
             var (CurrentDistance, CurrentNode) = PriorityQueue.Min;
             PriorityQueue.Remove(PriorityQueue.Min);
 
-            // Process neighbors
-            foreach (var (Neighbor, Weight) in Graph[CurrentNode])
+            foreach (var (Neighbour, Weight) in Graph[CurrentNode])
             {
                 int NewDistance = CurrentDistance + Weight;
 
-                // If a shorter path is found, update the distance and re-add to the queue
-                if (NewDistance < Distances[Neighbor])
+                if (NewDistance < Distances[Neighbour])
                 {
-                    PriorityQueue.Remove((Distances[Neighbor], Neighbor)); // Remove outdated distance
-                    Distances[Neighbor] = NewDistance;
-                    PriorityQueue.Add((NewDistance, Neighbor));
+                    PriorityQueue.Remove((Distances[Neighbour], Neighbour));
+                    Distances[Neighbour] = NewDistance;
+                    PriorityQueue.Add((NewDistance, Neighbour));
                 }
             }
         }
